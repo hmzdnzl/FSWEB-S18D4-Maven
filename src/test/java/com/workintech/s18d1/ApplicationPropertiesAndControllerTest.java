@@ -168,10 +168,13 @@ class ApplicationPropertiesAndControllerTest {
     @DisplayName("Remove burger test")
     void testRemoveBurger() throws Exception {
 
+        given(burgerDao.findById(sampleBurger.getId())).willReturn(sampleBurger);
         given(burgerDao.remove(sampleBurger.getId())).willReturn(sampleBurger);
 
         mockMvc.perform(delete("/burger/{id}", sampleBurger.getId()))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is((int) sampleBurger.getId())))
+            .andExpect(jsonPath("$.name", is(sampleBurger.getName())));
     }
 
 
@@ -181,7 +184,7 @@ class ApplicationPropertiesAndControllerTest {
         List<Burger> burgers = Arrays.asList(sampleBurger);
         given(burgerDao.findByBreadType(sampleBurger.getBreadType())).willReturn(burgers);
 
-        mockMvc.perform(get("/burger/breadType/{breadType}", sampleBurger.getBreadType()))
+        mockMvc.perform(get("/burger/breadType/{breadType}", sampleBurger.getBreadType().name()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name", is(sampleBurger.getName())));
@@ -191,12 +194,13 @@ class ApplicationPropertiesAndControllerTest {
     @DisplayName("Find by price test")
     void testFindByPrice() throws Exception {
         List<Burger> burgers = Arrays.asList(sampleBurger);
-        given(burgerDao.findByPrice(sampleBurger.getPrice().intValue())).willReturn(burgers);
 
-        mockMvc.perform(get("/burger/price/{price}", sampleBurger.getPrice().intValue()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is(sampleBurger.getName())));
+        int price = sampleBurger.getPrice() != null ? sampleBurger.getPrice().intValue() : 0;
+        given(burgerDao.findByPrice(price)).willReturn(burgers);
+        mockMvc.perform(get("/burger/price/{price}", price))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].name", is(sampleBurger.getName())));
     }
 
     @Test
