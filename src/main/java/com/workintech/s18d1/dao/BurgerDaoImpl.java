@@ -22,26 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 public class BurgerDaoImpl implements BurgerDao{
 
     private final EntityManager entityManager;
-    
 
     @Autowired
     public BurgerDaoImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
-    }
-
-    // For test usage
-    public BurgerDaoImpl(BurgerRepository burgerRepository) {
-        this.entityManager = null;
-      
-    }
-
-    public void entityManager() {
-
-    }
-
-    public BurgerDaoImpl() {
-        this.entityManager = null;
-   
     }
 
     @Transactional
